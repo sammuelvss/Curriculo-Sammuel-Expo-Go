@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "Currículo Express Mobile - Sammuel Victor",
+    "slug": "curriculo-express-sammuel",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "curriculo-express",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1E293B"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.unicap.curriculoexpress"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1E293B"
+      },
+      "package": "br.unicap.curriculoexpress"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "88495a2f-46b6-40f3-a2b8-66ef90daf447"
+      }
+    }
+  }
+}
