@@ -2,6 +2,7 @@
   "expo": {
     "name": "Currículo Express Mobile - Sammuel Victor",
     "slug": "curriculo-express-sammuel",
+    "owner": "sammuelvictors-team",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -35,7 +36,16 @@
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "7eb2e323-e386-448a-9071-db7fbf4de82d"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7eb2e323-e386-448a-9071-db7fbf4de82d"
     }
   }
 }
