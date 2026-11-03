@@ -1,6 +1,18 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { View, FlatList, StyleSheet, RefreshControl, Linking } from "react-native";
-import { Button, Card, Chip, IconButton, Searchbar, Text, useTheme } from "react-native-paper";
+import {
+  Button,
+  Card,
+  Chip,
+  FAB,
+  IconButton,
+  Modal,
+  Portal,
+  Searchbar,
+  Text,
+  TextInput,
+  useTheme,
+} from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
@@ -17,6 +29,13 @@ export default function ProjetosScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [tecnologias, setTecnologias] = useState("");
+  const [link, setLink] = useState("");
 
   const fetchProjects = async () => {
     try {
@@ -42,7 +61,6 @@ export default function ProjetosScreen() {
     fetchProjects();
   }, [perfilAtivoId]);
 
-  // Filtro dinâmico por palavra-chave ou tecnologia (Funcionalidade Extra Opção B)
   const filteredProjects = useMemo(() => {
     if (!searchQuery.trim()) return projects;
     const term = searchQuery.toLowerCase();
@@ -54,6 +72,39 @@ export default function ProjetosScreen() {
     );
   }, [projects, searchQuery]);
 
+  const handleCreateProject = async () => {
+    if (!titulo.trim()) return;
+    try {
+      setSubmitting(true);
+      await projectService.create({
+        titulo: titulo.trim(),
+        descricao: descricao.trim() || "Projeto adicionado via App Mobile Expo Go.",
+        tecnologias: tecnologias.trim() || "React Native, Expo, Node.js",
+        link: link.trim() || "https://github.com/sammuelvss",
+        profile_id: perfilAtivoId,
+      });
+      setTitulo("");
+      setDescricao("");
+      setTecnologias("");
+      setLink("");
+      setModalVisible(false);
+      fetchProjects();
+    } catch (err) {
+      console.error("Erro ao criar projeto:", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteProject = async (id) => {
+    try {
+      await projectService.delete(id);
+      fetchProjects();
+    } catch (err) {
+      console.error("Erro ao remover projeto:", err);
+    }
+  };
+
   const openLink = (url) => {
     if (url) {
       Linking.openURL(url).catch((err) => console.error("Erro ao abrir link:", err));
@@ -62,7 +113,7 @@ export default function ProjetosScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Header title="Galeria de Projetos" subtitle="Portfólio e Repositórios" />
+      <Header title="Galeria de Projetos" subtitle="Portfólio, Eventos e Repositórios" />
 
       <View style={styles.searchContainer}>
         <Searchbar
@@ -113,12 +164,20 @@ export default function ProjetosScreen() {
                     </View>
                   )}
                   right={(props) => (
-                    <IconButton
-                      {...props}
-                      icon={favorito ? "star" : "star-outline"}
-                      iconColor={favorito ? "#EAB308" : theme.colors.onSurfaceVariant}
-                      onPress={() => toggleFavorito(item.id)}
-                    />
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                      <IconButton
+                        {...props}
+                        icon={favorito ? "star" : "star-outline"}
+                        iconColor={favorito ? "#EAB308" : theme.colors.onSurfaceVariant}
+                        onPress={() => toggleFavorito(item.id)}
+                      />
+                      <IconButton
+                        {...props}
+                        icon="delete-outline"
+                        iconColor={theme.colors.error}
+                        onPress={() => handleDeleteProject(item.id)}
+                      />
+                    </View>
                   )}
                 />
 
@@ -163,6 +222,71 @@ export default function ProjetosScreen() {
           }}
         />
       )}
+
+      <Portal>
+        <Modal
+          visible={modalVisible}
+          onDismiss={() => setModalVisible(false)}
+          contentContainerStyle={[styles.modalContainer, { backgroundColor: theme.colors.surface }]}
+        >
+          <Text variant="titleLarge" style={{ fontWeight: "bold", marginBottom: 12, color: theme.colors.onSurface }}>
+            Novo Projeto (NeonDB)
+          </Text>
+          <TextInput
+            label="Título do Projeto *"
+            value={titulo}
+            onChangeText={setTitulo}
+            mode="outlined"
+            style={styles.input}
+          />
+          <TextInput
+            label="Descrição"
+            value={descricao}
+            onChangeText={setDescricao}
+            mode="outlined"
+            multiline
+            numberOfLines={3}
+            style={styles.input}
+          />
+          <TextInput
+            label="Tecnologias (separadas por vírgula)"
+            placeholder="Ex: React Native, Node.js, PostgreSQL"
+            value={tecnologias}
+            onChangeText={setTecnologias}
+            mode="outlined"
+            style={styles.input}
+          />
+          <TextInput
+            label="Link do Repositório"
+            placeholder="https://github.com/sammuelvss/..."
+            value={link}
+            onChangeText={setLink}
+            mode="outlined"
+            style={styles.input}
+          />
+          <View style={styles.modalActions}>
+            <Button mode="text" onPress={() => setModalVisible(false)} disabled={submitting}>
+              Cancelar
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleCreateProject}
+              loading={submitting}
+              disabled={!titulo.trim() || submitting}
+            >
+              Salvar no Banco
+            </Button>
+          </View>
+        </Modal>
+      </Portal>
+
+      <FAB
+        icon="plus"
+        label="Novo Projeto"
+        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        color="#FFFFFF"
+        onPress={() => setModalVisible(true)}
+      />
     </View>
   );
 }
@@ -182,7 +306,7 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     paddingTop: 8,
-    paddingBottom: 24,
+    paddingBottom: 88,
   },
   card: {
     marginBottom: 14,
@@ -213,5 +337,25 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     paddingHorizontal: 16,
     paddingBottom: 12,
+  },
+  fab: {
+    position: "absolute",
+    right: 16,
+    bottom: 16,
+    borderRadius: 16,
+  },
+  modalContainer: {
+    margin: 20,
+    padding: 20,
+    borderRadius: 16,
+  },
+  input: {
+    marginBottom: 10,
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 8,
+    marginTop: 8,
   },
 });

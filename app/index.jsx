@@ -1,12 +1,27 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, ScrollView, StyleSheet, RefreshControl, Linking } from "react-native";
-import { Avatar, Button, Card, Chip, Divider, SegmentedButtons, Text, useTheme } from "react-native-paper";
+import { Avatar, Button, Card, Chip, SegmentedButtons, Text, useTheme } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
 import EmptyState from "../components/EmptyState";
 import { profileService } from "../services/api";
 import { useStore } from "../zustand";
+
+const SAMMUEL_SKILLS = [
+  "Java (Spring Boot)",
+  "React",
+  "Next.js",
+  "Node.js",
+  "Express",
+  "PostgreSQL / MySQL",
+  "HTML5 & CSS3",
+  "Tailwind & Bootstrap",
+  "Git & GitHub",
+  "Figma & UX/UI",
+  "Metodologias Ágeis",
+  "Inglês B2",
+];
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -80,16 +95,18 @@ export default function HomeScreen() {
         .slice(0, 2)
         .join("")
         .toUpperCase()
-    : "CE";
+    : "SV";
 
   const profileOptions = profiles.map((p) => ({
     value: p.id,
     label: p.nome.split(" ")[0],
   }));
 
+  const isSammuel = currentProfile?.nome?.toLowerCase().includes("sammuel");
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Header title="Currículo Express" subtitle="Visão Geral do Perfil" />
+      <Header title="Currículo & Portfólio" subtitle="Sammuel Victor — Sistemas para Internet" />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -98,7 +115,7 @@ export default function HomeScreen() {
         {profiles.length > 1 && (
           <View style={styles.selectorContainer}>
             <Text variant="labelMedium" style={[styles.selectorLabel, { color: theme.colors.onSurfaceVariant }]}>
-              Alternar Perfil Ativo:
+              Alternar Currículo (NeonDB):
             </Text>
             <SegmentedButtons
               value={perfilAtivoId}
@@ -112,7 +129,7 @@ export default function HomeScreen() {
         <Card mode="elevated" style={[styles.card, { backgroundColor: theme.colors.surface }]}>
           <Card.Content style={styles.profileHeader}>
             <Avatar.Text
-              size={76}
+              size={80}
               label={initials}
               style={{ backgroundColor: theme.colors.primary }}
               color="#FFFFFF"
@@ -127,76 +144,6 @@ export default function HomeScreen() {
             >
               {currentProfile?.cargo}
             </Chip>
-          </Card.Content>
-        </Card>
-
-        <Card mode="elevated" style={[styles.card, { backgroundColor: theme.colors.surface }]}>
-          <Card.Title
-            title="Sobre Mim"
-            titleVariant="titleMedium"
-            left={(props) => <MaterialCommunityIcons {...props} name="account-details" size={24} color={theme.colors.primary} />}
-          />
-          <Card.Content>
-            <Text variant="bodyMedium" style={[styles.resumo, { color: theme.colors.onSurfaceVariant }]}>
-              {currentProfile?.resumo || "Nenhum resumo cadastrado."}
-            </Text>
-          </Card.Content>
-        </Card>
-
-        <Card mode="elevated" style={[styles.card, { backgroundColor: theme.colors.surface }]}>
-          <Card.Title
-            title="Contato & Redes"
-            titleVariant="titleMedium"
-            left={(props) => <MaterialCommunityIcons {...props} name="card-account-mail" size={24} color={theme.colors.primary} />}
-          />
-          <Card.Content style={styles.contactList}>
-            {currentProfile?.email && (
-              <Button
-                mode="text"
-                icon="email"
-                style={styles.contactButton}
-                contentStyle={styles.contactButtonContent}
-                onPress={() => openLink(`mailto:${currentProfile.email}`)}
-              >
-                {currentProfile.email}
-              </Button>
-            )}
-
-            {currentProfile?.telefone && (
-              <Button
-                mode="text"
-                icon="phone"
-                style={styles.contactButton}
-                contentStyle={styles.contactButtonContent}
-                onPress={() => openLink(`tel:${currentProfile.telefone.replace(/\D/g, "")}`)}
-              >
-                {currentProfile.telefone}
-              </Button>
-            )}
-
-            {currentProfile?.linkedin && (
-              <Button
-                mode="text"
-                icon="linkedin"
-                style={styles.contactButton}
-                contentStyle={styles.contactButtonContent}
-                onPress={() => openLink(currentProfile.linkedin)}
-              >
-                LinkedIn
-              </Button>
-            )}
-
-            {currentProfile?.github && (
-              <Button
-                mode="text"
-                icon="github"
-                style={styles.contactButton}
-                contentStyle={styles.contactButtonContent}
-                onPress={() => openLink(currentProfile.github)}
-              >
-                GitHub
-              </Button>
-            )}
           </Card.Content>
         </Card>
 
@@ -237,6 +184,101 @@ export default function HomeScreen() {
             </Card.Content>
           </Card>
         </View>
+
+        <Card mode="elevated" style={[styles.card, { backgroundColor: theme.colors.surface, marginTop: 14 }]}>
+          <Card.Title
+            title="Resumo Profissional"
+            titleVariant="titleMedium"
+            left={(props) => <MaterialCommunityIcons {...props} name="account-details" size={24} color={theme.colors.primary} />}
+          />
+          <Card.Content>
+            <Text variant="bodyMedium" style={[styles.resumo, { color: theme.colors.onSurfaceVariant }]}>
+              {currentProfile?.resumo || "Nenhum resumo cadastrado."}
+            </Text>
+          </Card.Content>
+        </Card>
+
+        {isSammuel && (
+          <Card mode="elevated" style={[styles.card, { backgroundColor: theme.colors.surface }]}>
+            <Card.Title
+              title="Habilidades & Competências"
+              subtitle="Stack Técnica e Idiomas"
+              titleVariant="titleMedium"
+              left={(props) => <MaterialCommunityIcons {...props} name="lightning-bolt" size={24} color={theme.colors.primary} />}
+            />
+            <Card.Content>
+              <View style={styles.skillsContainer}>
+                {SAMMUEL_SKILLS.map((skill, idx) => (
+                  <Chip
+                    key={idx}
+                    compact
+                    style={[styles.skillChip, { backgroundColor: theme.colors.surfaceVariant }]}
+                    textStyle={{ fontSize: 12, color: theme.colors.primary, fontWeight: "600" }}
+                  >
+                    {skill}
+                  </Chip>
+                ))}
+              </View>
+            </Card.Content>
+          </Card>
+        )}
+
+        <Card mode="elevated" style={[styles.card, { backgroundColor: theme.colors.surface }]}>
+          <Card.Title
+            title="Contato & Redes"
+            titleVariant="titleMedium"
+            left={(props) => <MaterialCommunityIcons {...props} name="card-account-mail" size={24} color={theme.colors.primary} />}
+          />
+          <Card.Content style={styles.contactList}>
+            {currentProfile?.email && (
+              <Button
+                mode="text"
+                icon="email"
+                style={styles.contactButton}
+                contentStyle={styles.contactButtonContent}
+                onPress={() => openLink(`mailto:${currentProfile.email}`)}
+              >
+                {currentProfile.email}
+              </Button>
+            )}
+
+            {currentProfile?.telefone && (
+              <Button
+                mode="text"
+                icon="phone"
+                style={styles.contactButton}
+                contentStyle={styles.contactButtonContent}
+                onPress={() => openLink(`tel:${currentProfile.telefone.replace(/\D/g, "")}`)}
+              >
+                {currentProfile.telefone}
+              </Button>
+            )}
+
+            {currentProfile?.linkedin && (
+              <Button
+                mode="text"
+                icon="linkedin"
+                style={styles.contactButton}
+                contentStyle={styles.contactButtonContent}
+                onPress={() => openLink(currentProfile.linkedin)}
+              >
+                LinkedIn ({currentProfile.linkedin.replace("https://www.", "").replace("https://", "")})
+              </Button>
+            )}
+
+            {currentProfile?.github && (
+              <Button
+                mode="text"
+                icon="github"
+                style={styles.contactButton}
+                contentStyle={styles.contactButtonContent}
+                onPress={() => openLink(currentProfile.github)}
+              >
+                GitHub ({currentProfile.github.replace("https://", "")})
+              </Button>
+            )}
+          </Card.Content>
+        </Card>
       </ScrollView>
     </View>
   );
@@ -279,6 +321,15 @@ const styles = StyleSheet.create({
   resumo: {
     lineHeight: 22,
   },
+  skillsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  skillChip: {
+    marginRight: 4,
+    marginBottom: 6,
+  },
   contactList: {
     alignItems: "flex-start",
   },
@@ -291,7 +342,7 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 4,
+    marginTop: 2,
   },
   statCard: {
     flex: 1,
