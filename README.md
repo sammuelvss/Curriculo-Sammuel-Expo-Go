@@ -9,7 +9,7 @@ Aplicativo mobile multiplataforma desenvolvido com **React Native**, **Expo (SDK
 - **Disciplina:** Programação para Dispositivos Móveis (PDM 2026.2)
 - **API em Produção (Vercel):** [https://curriculo-api-sammuel.vercel.app](https://curriculo-api-sammuel.vercel.app)
 - **Repositório da API (Express):** [https://github.com/sammuelvss/Curriculo-API-Sammuel](https://github.com/sammuelvss/Curriculo-API-Sammuel)
-- **Projeto no Expo (OTA Update / QR Code):** [https://expo.dev/accounts/sammuelvictors-team/projects/curriculo-express-sammuel/updates/295482cc-5879-49a7-84e5-5ab2ad2bcfae](https://expo.dev/accounts/sammuelvictors-team/projects/curriculo-express-sammuel/updates/295482cc-5879-49a7-84e5-5ab2ad2bcfae)
+- **Projeto no Expo (OTA Update / QR Code):** [https://expo.dev/accounts/sammuelvictors-team/projects/curriculo-express-sammuel/updates/6b9c857f-07e6-47c6-8201-2849bd798951](https://expo.dev/accounts/sammuelvictors-team/projects/curriculo-express-sammuel/updates/6b9c857f-07e6-47c6-8201-2849bd798951)
 
 ---
 
